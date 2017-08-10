@@ -130,7 +130,7 @@ def detect(args):
         img = mpimg.imread(os.path.join(args.test_img_folder, img_name))
         rimg, rpredictions, rlocalisations, rbbox_img = isess.run([image_4d, predictions, localisations, bbox_img],
                                                               feed_dict={img_input: img})
-        select_threshold=0.65
+        select_threshold=0.70
         nms_threshold=.1
          #Get classes and bboxes from the net outputs.
         rclasses, rscores, rbboxes = np_methods.ssd_bboxes_select(
