@@ -124,21 +124,15 @@ def detect(args):
 
     # SSD default anchor boxes.
     ssd_anchors = ssd_net.anchors(net_shape)
-    
-    cap = cv2.VideoCapture(args.test_img_folder)
-    while(cap.isOpened()):
-       
-        re, frame = cap.read()
-       
-        #img=frame
-        if re == False:
-            break
-        img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+    for img_name in os.listdir(args.test_img_folder): 
+        #args.test_img_folder
+        img = mpimg.imread(os.path.join(args.test_img_folder, img_name))
         rimg, rpredictions, rlocalisations, rbbox_img = isess.run([image_4d, predictions, localisations, bbox_img],
                                                               feed_dict={img_input: img})
         select_threshold=0.65
-        nms_threshold=0.01
-        # Get classes and bboxes from the net outputs.
+        nms_threshold=.1
+         #Get classes and bboxes from the net outputs.
         rclasses, rscores, rbboxes = np_methods.ssd_bboxes_select(
                 rpredictions, rlocalisations, ssd_anchors,
                 select_threshold=select_threshold, img_shape=net_shape, num_classes=2, decode=True)
@@ -146,12 +140,12 @@ def detect(args):
         rbboxes = np_methods.bboxes_clip(rbbox_img, rbboxes)
         rclasses, rscores, rbboxes = np_methods.bboxes_sort(rclasses, rscores, rbboxes, top_k=400)
         rclasses, rscores, rbboxes = np_methods.bboxes_nms(rclasses, rscores, rbboxes, nms_threshold=nms_threshold)
-        # Resize bboxes to original image shape. Note: useless for Resize.WARP!
+          
+        #Resize bboxes to original image shape. Note: useless for Resize.WARP!
         rbboxes = np_methods.bboxes_resize(rbbox_img, rbboxes)
-        #print(rclasses, rscores, rbboxes,img_name)
+        print(rclasses, rscores, rbboxes,img_name)
         bboxes_draw_on_img(img, rclasses, rscores, rbboxes, colors_plasma, 2)
-        cv2.imshow('frame',img)
-        cv2.waitKey(150) 
+        plt_bboxes(img, rclasses, rscores, rbboxes)
 
        
 
@@ -170,3 +164,4 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     detect(args)
+
