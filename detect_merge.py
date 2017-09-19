@@ -10,6 +10,8 @@ import argparse
 import numpy as np
 import tensorflow as tf
 import cv2
+import pickle
+import math
 from time import time
 
 slim = tf.contrib.slim
@@ -46,10 +48,10 @@ def adjust_bboxes(height,width,x1,y1,bboxes):
         p1 = (int(bbox[0] * net_shape[0]), int(bbox[1] * net_shape[1]))
         p2 = (int(bbox[2] * net_shape[0]), int(bbox[3] * net_shape[1]))
         
-        new_p1=(float(p1[0]+y1)/float(height),float(p1[1]+x1)/float(width))
-        new_p2=(float(p2[0]+y1)/float(height),float(p2[1]+x1)/float(width))
+        adjust_p1=(float(p1[0]+y1)/float(height),float(p1[1]+x1)/float(width))
+        adjust_p2=(float(p2[0]+y1)/float(height),float(p2[1]+x1)/float(width))
              
-        bboxes[i]=list(new_p1+new_p2)
+        bboxes[i]=list(adjust_p1+adjust_p2)
         
     return bboxes
     
@@ -106,13 +108,15 @@ def detect_img(img,isess,image_4d,predictions,localisations,bbox_img,img_input,s
         merge_img=np.ones((height,width,3),np.uint8)
         merge_bboxes=[]
         merge_scores=[]
-        x1=0
-        y1=0
-        for y1_ in range(1,int(height/512)-1):
-            for x1_ in range(1,int(width/512)-1):
+        x=int(math.ceil(width/512.))
+        y=int(math.ceil(height/512.))
+        detected=0
+        for y1_ in range(0,y):
+            for x1_ in range(0,x):
+        
                 x1,y1,crop_height,crop_width=img_crop_bounding(height,width,x1_,y1_)
 
-                print(height,width,crop_height,crop_width,x1, y1)
+                print(height,width,crop_height,crop_width,y1,x1)
         
                 img= org_img[y1:y1+crop_height,x1:x1+crop_width]
                 
@@ -132,17 +136,21 @@ def detect_img(img,isess,image_4d,predictions,localisations,bbox_img,img_input,s
     #               cv2.imshow('frame',img)
                 bboxes_draw_on_img(img, rclasses, rscores, rbboxes, 2)
                 
-                merge_img[y1:y1+crop_height,x1:x1+crop_height]=img
+                merge_img[y1:y1+crop_height,x1:x1+crop_width]=img
+                
                 if len(rbboxes):                
                     merge_bboxes.append(adjust_bboxes(height,width,x1,y1,rbboxes))
                     merge_scores.append(rscores)
+                    detected=1
+                else:
+                    merge_bboxes.append(np.zeros((0,4),dtype=np.float32))
+                    merge_scores.append(np.zeros((0),dtype=np.float32))
                 
 
                 #cv2.imwrite('./test'+str(i)+'.jpg',merge_img)
-           # i=i+1   
         #cv2.waitKey(1000)
-        num_of_img=x1*y1
-        return merge_img,merge_bboxes,merge_scores,num_of_img
+        img_num_tuple=(x,y)
+        return merge_img, merge_bboxes, merge_scores, img_num_tuple, detected
 
 
 def detect(args):
@@ -181,16 +189,22 @@ def detect(args):
 
         prev_time=time()
         
-        merge_img,boxes, scores ,num_of_img= detect_img(img,isess,image_4d,predictions,localisations,bbox_img,img_input,ssd_anchors)        
+        merge_img,boxes, scores ,num_of_img,detected= detect_img(img,isess,image_4d,predictions,localisations,bbox_img,img_input,ssd_anchors)        
         
-        fps,total_time=FPS(prev_time,num_of_img)
+        f1= open('bboxes.txt','wb')
+        pickle.dump(boxes,f1)
+        f2= open('scores.txt','wb')
+        pickle.dump(scores,f2)            
+        
+        fps,total_time=FPS(prev_time,num_of_img[0]*num_of_img[1])
         print("FPS :  %f " %fps," total time : %f "%total_time )
+        print(num_of_img)        
         cv2.resizeWindow('frame', 5000,5000)
         cv2.imshow('frame',merge_img)
-        cv2.waitKey(1000)
+        cv2.waitKey(10000)
               
         print(boxes)
-
+    
 
 
 if __name__ == '__main__':
@@ -200,7 +214,7 @@ if __name__ == '__main__':
             type=str)
     parser.add_argument('-d', dest='test_img_folder', 
             help='The images folder to be detected',
-            default='./test', type=str)
+            default='./test4', type=str)
     parser.add_argument('--output', dest='output_fn',  
             help='The output path', 
             default='detect_results.txt', type=str) 
