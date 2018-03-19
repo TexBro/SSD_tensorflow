@@ -9,9 +9,10 @@ The organisation is inspired by the TF-Slim models repository containing the imp
 * networks: definition of SSD networks, and common encoding and decoding methods (we refer to the paper on this precise topic);
 * pre-processing: pre-processing and data augmentation routines, inspired by original VGG and Inception implementations.
 
+[![Video Label](http://img.youtube.com/vi/b56m1uQlySg/0.jpg)](https://www.youtube.com/watch?v=b56m1uQlySg) Video Label
+[![Video Label](http://img.youtube.com/vi/X0bc5sWAlhw/0.jpg)](https://www.youtube.com/watch?v=X0bc5sWAlhw) Video Label
 
-<iframe width="640" height="360" src="https://www.youtube.com/watch?v=b56m1uQlySg" frameborder="0" gesture="media" allowfullscreen=""></iframe>
-<iframe width="640" height="360" src="https://www.youtube.com/watch?v=X0bc5sWAlhw" frameborder="0" gesture="media" allowfullscreen=""></iframe>
+
 
 
 # =================================================== #
