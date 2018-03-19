@@ -9,11 +9,13 @@ The organisation is inspired by the TF-Slim models repository containing the imp
 * networks: definition of SSD networks, and common encoding and decoding methods (we refer to the paper on this precise topic);
 * pre-processing: pre-processing and data augmentation routines, inspired by original VGG and Inception implementations.
 
-[![Alt text for your video](https://youtu.be/b56m1uQlySg)]
+[![Watch the video](https://youtu.be/b56m1uQlySg)]
 
-=========================================================================== #
+[![Watch the video](https://youtu.be/X0bc5sWAlhw)]
+
+# =================================================== #
 # Fine tune VGG-based SSD network
-# =========================================================================== #
+# =================================================== #
 
 DATASET_DIR=./result
 TRAIN_DIR=./log_finetune/
@@ -35,9 +37,9 @@ python train_ssd_network.py \
     --batch_size=16
     
     
-# =========================================================================== #
+# ================================================================== #
 # Test VGG-based SSD network
-# =========================================================================== #
+# =================================================================== #
 EVAL_DIR=./logs/
 CHECKPOINT_PATH=./log_finetune/model.ckpt-7087
 
