@@ -9,7 +9,7 @@ The organisation is inspired by the TF-Slim models repository containing the imp
 * networks: definition of SSD networks, and common encoding and decoding methods (we refer to the paper on this precise topic);
 * pre-processing: pre-processing and data augmentation routines, inspired by original VGG and Inception implementations.
 
-[![Alt text for your video]](https://youtu.be/b56m1uQlySg)
+[![Alt text for your video](https://youtu.be/b56m1uQlySg)]
 
 =========================================================================== #
 # Fine tune VGG-based SSD network
